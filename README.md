@@ -29,3 +29,19 @@ ggplot(titanic_dataset, aes(x = familysize, fill = factor(survived))) +
 c. Impute the missing values in Age variable using Mice Library, create two different
 graphs showing Age distribution before and after imputation.
 
+library(mice)
+titanic_dataset$age
+sum(is.na(titanic_dataset$age))
+factor_vars <- c('pclass','sex','embarked', 'Title','familysize')
+titanic_dataset[factor_vars] <- lapply(titanic_dataset[factor_vars], function(x) as.factor(x))
+set.seed(123)
+mice_mod <- mice(titanic_dataset[, !names(titanic_dataset) %in% c('pclass','sex','embarked','Title','familysize')], method='rf')
+mice_output <- complete(mice_mod)
+titanic_dataset$Newage <- mice_output$age
+as.integer(titanic_dataset$Newage)
+par(mfrow=c(1,2))
+hist(titanic_dataset$age, freq=F, main='Age: Original Data', 
+     col='darkgreen', ylim=c(0,0.04))
+hist(titanic_dataset$Newage, freq=F, main='Age: MICE Output', 
+     col='lightgreen', ylim=c(0,0.04))
+
